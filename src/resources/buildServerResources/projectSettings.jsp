@@ -16,7 +16,7 @@ limitations under the License.
 
 <%@ include file="/include.jsp"%>
 
-<c:url value="/configuremsTeams.html" var="actionUrl" />
+<c:url value="/configureMSTeams.html" var="actionUrl" />
 
 <bs:linkCSS dynamic="${true}">
   ${teamcityPluginResourcesPath}css/msTeamsAdmin.css
@@ -32,32 +32,29 @@ limitations under the License.
 		<bs:messages key="configurationSaved" />
 		<table class="runnerFormTable">
 			<tr>
-				<th><label for="roomId">Room: </label></th>
+				<th><label for="channelUrl">Webhook URL: </label></th>
 				<td>
-				  <forms:select name="roomId">
-				  	<forms:option value="none" selected="${'none' == roomId}">(None)</forms:option>
-				  	<forms:option value="default" selected="${'default' == roomId}">(Default)</forms:option>
-				  	<c:if test="${!isRootProject}">
-					  	<forms:option value="parent" selected="${'parent' == roomId}">(Parent)</forms:option>
-					</c:if>                    
-                    <c:forEach var="roomIdEntry" items="${roomIdList}">
-                      <forms:option value="${roomIdEntry.value}" selected="${roomIdEntry.value == roomId}">
-                        <c:out value="${roomIdEntry.key}"/>
-                      </forms:option>
-                    </c:forEach>
-                  </forms:select>
+				  <textarea name="channelUrl" id="channelUrl">${channelUrl}</textarea>
                 </td>
 			</tr>
 			<tr>
-				<th><label for="notify">Trigger notifications: </label></th>
+				<th><label for="notify">Trigger Notifications: </label></th> <!-- TODO is this a thing in Teams? -->
 				<td>
 					<forms:checkbox name="notify" checked="${notify}" value="${notify}"/>
 					<span class="smallNote">When checked, a notification for all people in the room will be triggered, taking user preferences into account.</span>
 				</td>
 			</tr>
+			<tr>
+				<th><label for="enabled">Enabled Notifications: </label></th>
+				<td>
+					<forms:checkbox name="enabled" checked="${enabled}" value="${enabled}"/>
+					<span class="smallNote">Uncheck to disable notifications altogether for this build configuration.</span>
+				</td>
+			</tr>
 		</table>
 		<div class="saveButtonsBlock">
 			<forms:submit label="Save" />
+			<forms:submit id="testConnection" type="button" label="Post Test Message" onclick="return msTeamsProject.testConnection()"/>
 			<input type="hidden" id="projectId" name="projectId" value="${projectId}"/>
 			<forms:saving />
 		</div>

@@ -24,28 +24,32 @@ public class MSTeamsProjectConfiguration {
 	@XStreamAlias(MSTeamsConfiguration.PROJECT_ID_KEY)
 	private String projectId;
 	
-	@XStreamAlias(MSTeamsConfiguration.ROOM_ID_KEY)
-	private String roomId;
+	@XStreamAlias(MSTeamsConfiguration.CHANNEL_URL_KEY)
+	private String channelUrl;
 	
 	@XStreamAlias(MSTeamsConfiguration.NOTIFY_STATUS_KEY)
 	private boolean notify;
 	
-	public MSTeamsProjectConfiguration(String projectId, String roomId, boolean notifyStatus) {
+	@XStreamAlias(MSTeamsConfiguration.PROJECT_ENABLED_KEY)
+	private boolean enabled;
+	
+	public MSTeamsProjectConfiguration(String projectId, String channelUrl, boolean notifyStatus, boolean enabled) {
 		this.projectId = projectId;
-		this.roomId = roomId;
+		this.channelUrl = channelUrl;
 		this.notify = notifyStatus;
+		this.enabled = enabled;
 	}
 	
 	public String getProjectId() {
 		return this.projectId;
 	}
 
-	public String getRoomId() {
-		return this.roomId;
+	public String getChannelUrl() {
+		return this.channelUrl;
 	}
 
-	public void setRoomId(String roomId) {
-		this.roomId = roomId;
+	public void setChannelUrl(String roomId) {
+		this.channelUrl = roomId;
 	}
 	
 	public boolean getNotifyStatus() {
@@ -54,5 +58,13 @@ public class MSTeamsProjectConfiguration {
 	
 	public void setNotifyStatus(boolean status) {
 		this.notify = status;
+	}
+	
+	public boolean getEnabled() {
+		return this.enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

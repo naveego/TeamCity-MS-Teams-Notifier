@@ -20,14 +20,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -53,17 +48,14 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 	private SBuildServer server;
 	private MSTeamsConfiguration configuration;
 	private MSTeamsApiProcessor processor;
-	private static Random rng = new Random();
 	private String messageFormat;
 	private HashMap<TeamCityEvent, MSTeamsMessageBundle> eventMap;
 	private MSTeamsNotificationMessageTemplates templates;
-	private MSTeamsEmoticonCache emoticonCache;
 
 	public MSTeamsServerExtension(@NotNull SBuildServer server, 
 			@NotNull MSTeamsConfiguration configuration, 
 			@NotNull MSTeamsApiProcessor processor, 
-			@NotNull MSTeamsNotificationMessageTemplates templates, 
-			@NotNull MSTeamsEmoticonCache emoticonCache) {
+			@NotNull MSTeamsNotificationMessageTemplates templates) {
 		this.server = server;
 		//this.configDirectory = serverPaths.getConfigDir();
 		this.configuration = configuration;
@@ -77,7 +69,6 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 		this.eventMap.put(TeamCityEvent.BUILD_INTERRUPTED, new MSTeamsMessageBundle(MSTeamsEmoticonSet.INDIFFERENT, MSTeamsMessageColour.WARNING));
 		this.eventMap.put(TeamCityEvent.SERVER_STARTUP, new MSTeamsMessageBundle(null, MSTeamsMessageColour.NEUTRAL));
 		this.eventMap.put(TeamCityEvent.SERVER_SHUTDOWN,new MSTeamsMessageBundle(null, MSTeamsMessageColour.NEUTRAL));
-		this.emoticonCache = emoticonCache;
 		logger.debug("Server extension created");
 	}
 
@@ -157,10 +148,10 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 			String colour = bundle.getColour();
 			String message = renderTemplate(this.templates.readTemplate(event), new HashMap<String, Object>());
 			MSTeamsRoomNotification notification = new MSTeamsRoomNotification(message, this.messageFormat, colour, notify);
-			String roomId = this.configuration.getDefaultRoomId();
+			String roomId = this.configuration.getDefaultChannelUrl();
 			if ((event == TeamCityEvent.SERVER_STARTUP || event == TeamCityEvent.SERVER_SHUTDOWN) && 
-					this.configuration.getServerEventRoomId() != null) {
-				roomId = this.configuration.getServerEventRoomId();
+					this.configuration.getServerEventChannelUrl() != null) {
+				roomId = this.configuration.getServerEventChannelUrl();
 			}
 			if (roomId != null) {
 				this.processor.sendNotification(notification, roomId);
@@ -189,45 +180,56 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 				String colour = getBuildEventMessageColour(event);
 				ProjectManager projectManager = this.server.getProjectManager();
 				SProject project = projectManager.findProjectById(build.getProjectId());
-				MSTeamsProjectConfiguration projectConfiguration = Utils.determineProjectConfiguration(project, configuration);
-				MSTeamsRoomNotification notification = new MSTeamsRoomNotification(message, this.messageFormat, colour, projectConfiguration.getNotifyStatus());
-				String roomId = projectConfiguration.getRoomId();
-				logger.debug(String.format("Room to be notified: %s", roomId));
-				if (!Utils.IsRoomIdNullOrNone(roomId)) {
-					if (roomId.equals(MSTeamsConfiguration.ROOM_ID_DEFAULT_VALUE)) {
-						roomId = configuration.getDefaultRoomId();
-					} else if (roomId.equals(MSTeamsConfiguration.ROOM_ID_PARENT_VALUE)) {
-						MSTeamsProjectConfiguration parentProjectConfiguration = Utils.findFirstSpecificParentConfiguration(project, configuration);
-						if (parentProjectConfiguration != null) {
-							logger.debug("Using specific configuration in hierarchy determined implicitly");
-							roomId = parentProjectConfiguration.getRoomId();
-							notification.notify = parentProjectConfiguration.getNotifyStatus();
-						}
-					}
-					
-					if (!Utils.IsRoomIdNullOrNone(roomId)) {
-						logger.debug(String.format("Room notified: %s", roomId));
-						this.processor.sendNotification(notification, roomId);
-					}
+				
+				String channelUrl = getChannelUrl(project);
+				MSTeamsProjectConfiguration projectConfiguration = configuration.getProjectConfiguration(project.getProjectId());
+				boolean notify = projectConfiguration.getNotifyStatus();
+				boolean enabled = projectConfiguration.getEnabled();
+				
+				MSTeamsRoomNotification notification = new MSTeamsRoomNotification(message, this.messageFormat, colour, notify);
+				
+				if (enabled) {
+					logger.debug(String.format("Channel to be notified: %s", channelUrl));
+					logger.debug(String.format("Notification setting: %s", notify));
+					this.processor.sendNotification(notification, channelUrl);
 				}
 			}
 		} catch (Exception e) {
 			logger.error("Could not process build event", e);
 		}
 	}
-
+	
+	/*
+	 * Tries to use current project's config, then walks back up the hierarchy. If those are all empty, 
+	 * use the admin-level default. Then fall back on the server notifications channel. Then return null 
+	 * if literally nothing is configured.
+	 */
+	private String getChannelUrl(SProject project) {
+		if (project.getParentProject() == null) {
+			String defaultChannelUrl = configuration.getDefaultChannelUrl(); 
+			if (defaultChannelUrl != null && !defaultChannelUrl.equals("")) {
+				return defaultChannelUrl;
+			}
+			String serverEventChannelUrl = configuration.getServerEventChannelUrl(); 
+			if (serverEventChannelUrl != null && !serverEventChannelUrl.equals("")) {
+				return serverEventChannelUrl;
+			}
+			return null;
+		}
+		MSTeamsProjectConfiguration projectConfiguration = configuration.getProjectConfiguration(project.getProjectId());
+		String channelUrl = projectConfiguration.getChannelUrl();
+		if (channelUrl != null && !channelUrl.equals("")) {
+			return channelUrl;
+		}
+		return getChannelUrl(project.getParentProject());
+	}
+	
 	private String getBuildEventMessageColour(TeamCityEvent buildEvent) {
 		return this.eventMap.get(buildEvent).getColour();
 	}
 		
 	private String createHtmlBuildEventMessage(SRunningBuild build, TeamCityEvent buildEvent) throws TemplateException, IOException {	
-		MSTeamsMessageBundle bundle = this.eventMap.get(buildEvent);
 		Template template = this.templates.readTemplate(buildEvent);
-		
-		// Emoticon
-		String emoticon = getRandomEmoticon(bundle.getEmoticonSet());
-		logger.debug(String.format("Emoticon: %s", emoticon));
-		String emoticonUrl = this.emoticonCache.get(emoticon);
 
 		// Branch
 		Branch branch = build.getBranch();
@@ -301,7 +303,6 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 		}
 		// Standard plugin parameters
 		logger.debug("Adding standard parameters");
-	    templateMap.put(MSTeamsNotificationMessageTemplates.Parameters.EMOTICON_URL, emoticonUrl == null ? "" : emoticonUrl);		
 	    templateMap.put(MSTeamsNotificationMessageTemplates.Parameters.FULL_NAME, build.getBuildType().getFullName());
 	    templateMap.put(MSTeamsNotificationMessageTemplates.Parameters.TRIGGERED_BY, build.getTriggeredBy().getAsString());
 	    templateMap.put(MSTeamsNotificationMessageTemplates.Parameters.HAS_CONTRIBUTORS, hasContributors);
@@ -323,15 +324,18 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 	}
 
 	private static String getContributors(SBuild build) {
-		UserSet<SUser> committers = build.getCommitters(SelectPrevBuildPolicy.SINCE_LAST_BUILD);	
-		Collection<String> userSet = new HashSet<String>();
+		UserSet<SUser> committers = build.getCommitters(SelectPrevBuildPolicy.SINCE_LAST_BUILD);
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
 		for (SUser committer : committers.getUsers()) {
-			userSet.add(committer.getDescriptiveName());
+			if (first) {
+				first = false;
+			} else {
+				sb.append(", ");
+			}
+			sb.append(committer.getDescriptiveName());
 		}
-		List<String> userList = new ArrayList<String>(userSet);
-		Collections.sort(userList, String.CASE_INSENSITIVE_ORDER);
-		String contributors = Utils.join(userList);
-		return contributors;
+		return sb.toString();
 	}
 	
 	private static String renderTemplate(Template template, Map<String, Object> templateMap) throws TemplateException, IOException {
@@ -342,10 +346,4 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 	    writer.close();
 	    return renderedTemplate;		
 	}
-	
-	private static String getRandomEmoticon(String[] set) {
-		int i = rng.nextInt(set.length);
-		return set[i];
-	}
-
 }

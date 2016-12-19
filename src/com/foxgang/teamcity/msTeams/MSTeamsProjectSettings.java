@@ -29,11 +29,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class MSTeamsProjectSettings extends EditProjectTab {
 
-	private static final String ROOM_ID_LIST = "roomIdList";
 	private static final String PAGE = "projectSettings.jsp";
 
 	private static Logger logger = Logger.getLogger("com.foxgang.teamcity.msTeams");
@@ -50,7 +48,7 @@ public class MSTeamsProjectSettings extends EditProjectTab {
 	                              @NotNull SecurityContext securityContext,
 	                              @NotNull MSTeamsConfiguration configuration,
 	                              @NotNull MSTeamsApiProcessor processor) {
-		super(pagePlaces, "msTeams", descriptor.getPluginResourcesPath(PAGE), "msTeams");
+		super(pagePlaces, "Microsoft Teams", descriptor.getPluginResourcesPath(PAGE), "MSTeams");
 		this.securityContext = securityContext;
 		this.configuration = configuration;
 		this.processor = processor;
@@ -65,21 +63,12 @@ public class MSTeamsProjectSettings extends EditProjectTab {
 		if (project != null) {
 			String projectId = project.getProjectId();
 			model.put(MSTeamsConfiguration.PROJECT_ID_KEY, projectId);
-			TreeMap<String, String> rooms = Utils.getRooms(this.processor);
-			model.put(ROOM_ID_LIST, rooms);
-			boolean isRootProject = Utils.isRootProject(project);
 			MSTeamsProjectConfiguration projectConfiguration = this.configuration.getProjectConfiguration(projectId);
 			if (projectConfiguration != null) {
-				model.put(MSTeamsConfiguration.ROOM_ID_KEY, projectConfiguration.getRoomId());
+				model.put(MSTeamsConfiguration.CHANNEL_URL_KEY, projectConfiguration.getChannelUrl());
 				model.put(MSTeamsConfiguration.NOTIFY_STATUS_KEY, projectConfiguration.getNotifyStatus());
-			} else if (isRootProject) {
-				model.put(MSTeamsConfiguration.ROOM_ID_KEY, MSTeamsConfiguration.ROOM_ID_DEFAULT_VALUE);
-				model.put(MSTeamsConfiguration.NOTIFY_STATUS_KEY, configuration.getDefaultNotifyStatus());
-			} else {
-				model.put(MSTeamsConfiguration.ROOM_ID_KEY, MSTeamsConfiguration.ROOM_ID_PARENT_VALUE);
-				model.put(MSTeamsConfiguration.NOTIFY_STATUS_KEY, configuration.getDefaultNotifyStatus());
+				model.put(MSTeamsConfiguration.PROJECT_ENABLED_KEY, projectConfiguration.getEnabled());
 			}
-			model.put(MSTeamsConfiguration.IS_ROOT_PROJECT_KEY, isRootProject);
 			logger.debug("Configuration page variables populated");
 		}
 	}

@@ -28,17 +28,6 @@ import org.apache.http.HttpStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.SBuildServer;
@@ -48,10 +37,6 @@ import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -59,10 +44,9 @@ public class MSTeamsConfigurationController extends BaseController {
 
 	private static final Object ACTION_ENABLE = "enable";
 	private static final String ACTION_PARAMETER = "action";
-	private static final String CONTROLLER_PATH = "/configuremsTeams.html";
+	private static final String CONTROLLER_PATH = "/configureMSTeams.html";
 	public static final String EDIT_PARAMETER = "edit";
 	private static final String TEST_PARAMETER = "test";
-	private static final String RELOAD_EMOTICONS_PARAMTER = "reloadEmoticons";
 	private static final String PROJECT_PARAMETER = "project";
 	private static final String msTeams_CONFIG_FILE = "msTeams.xml";
 	public static final String msTeams_CONFIG_DIRECTORY = "msTeams";
@@ -76,34 +60,33 @@ public class MSTeamsConfigurationController extends BaseController {
 	private MSTeamsConfiguration configuration;
 	private MSTeamsApiProcessor processor;
 	private MSTeamsNotificationMessageTemplates templates;
-	private MSTeamsEmoticonCache emoticonCache;
 	
 	public MSTeamsConfigurationController(@NotNull SBuildServer server, 
 			@NotNull ServerPaths serverPaths, 
 			@NotNull WebControllerManager manager,
 			@NotNull MSTeamsConfiguration configuration, 
 			@NotNull MSTeamsApiProcessor processor, 
-			@NotNull MSTeamsNotificationMessageTemplates templates,
-			@NotNull MSTeamsEmoticonCache emoticonCache) throws IOException {
+			@NotNull MSTeamsNotificationMessageTemplates templates) throws IOException {
 		manager.registerController(CONTROLLER_PATH, this);
 		this.configuration = configuration;
 		this.configFilePath = (new File(serverPaths.getConfigDir(), msTeams_CONFIG_FILE)).getCanonicalPath();
 		this.processor = processor;
 		this.templates = templates;
-		this.emoticonCache = emoticonCache;
 		logger.debug(String.format("Config file path: %s", this.configFilePath));
 		logger.info("Controller created");
 	}
 
 	private void handleProjectConfigurationChange(HttpServletRequest request) throws IOException {
 		logger.debug("Changing project configuration");
-		String roomId = request.getParameter(MSTeamsConfiguration.ROOM_ID_KEY);
+		String channelUrl = request.getParameter(MSTeamsConfiguration.CHANNEL_URL_KEY);
 		boolean notify = Boolean.parseBoolean(request.getParameter(MSTeamsConfiguration.NOTIFY_STATUS_KEY));
+		boolean enabled = Boolean.parseBoolean(request.getParameter(MSTeamsConfiguration.PROJECT_ENABLED_KEY));
 		String projectId = request.getParameter(MSTeamsConfiguration.PROJECT_ID_KEY);
-		logger.debug(String.format("Room ID: %s", roomId));
+		logger.debug(String.format("Channel URL: %s", channelUrl));
 		logger.debug(String.format("Trigger notification: %s", notify));
+		logger.debug(String.format("Enable notifications: %s", enabled));
 		logger.debug(String.format("Project ID: %s", projectId));
-		MSTeamsProjectConfiguration projectConfiguration = new MSTeamsProjectConfiguration(projectId, roomId, notify);
+		MSTeamsProjectConfiguration projectConfiguration = new MSTeamsProjectConfiguration(projectId, channelUrl, notify, enabled);
 		this.configuration.setProjectConfiguration(projectConfiguration);
 		this.getOrCreateMessages(request).addMessage(SAVED_ID, SAVED_MESSAGE);
 		this.saveConfiguration();
@@ -124,11 +107,8 @@ public class MSTeamsConfigurationController extends BaseController {
 		logger.debug(String.format("Query string: '%s'", request.getQueryString()));
 		
 		// Get parameters
-		String apiUrl = request.getParameter(MSTeamsConfiguration.API_URL_KEY);
-		String bypassSslCheck = request.getParameter(MSTeamsConfiguration.BYPASS_SSL_CHECK);
-		String apiToken = request.getParameter(MSTeamsConfiguration.API_TOKEN_KEY);
-		String defaultRoomId = request.getParameter(MSTeamsConfiguration.DEFAULT_ROOM_ID_KEY);
-		String serverEventRoomId = request.getParameter(MSTeamsConfiguration.SERVER_EVENT_ROOM_ID_KEY);
+		String defaultChannelUrl = request.getParameter(MSTeamsConfiguration.DEFAULT_CHANNEL_URL_KEY);
+		String serverEventChannelUrl = request.getParameter(MSTeamsConfiguration.SERVER_EVENT_CHANNEL_URL_KEY);
 		String notify = request.getParameter(MSTeamsConfiguration.NOTIFY_STATUS_KEY);
 	    String branchFilter = request.getParameter(MSTeamsConfiguration.BRANCH_FILTER_KEY);
 	    String branchFilterRegex = request.getParameter(MSTeamsConfiguration.BRANCH_FILTER_REGEX_KEY);
@@ -148,12 +128,9 @@ public class MSTeamsConfigurationController extends BaseController {
 		String serverShutdownTemplate = request.getParameter(MSTeamsNotificationMessageTemplates.SERVER_SHUTDOWN_TEMPLATE_KEY);
 		
 		// Logging
-		logger.debug(String.format("API URL: %s", apiUrl));
-		logger.debug(String.format("Bypass SSL check: %s", bypassSslCheck));
-		logger.debug(String.format("API token: %s", apiToken));
 		logger.debug(String.format("Trigger notification: %s", notify));
 		logger.debug("Events:");
-		logger.debug(String.format("\tDefault room ID: %s", defaultRoomId));
+		logger.debug(String.format("\tDefault Channel URL: %s", defaultChannelUrl));
 	    logger.debug(String.format("\tBranch filter enabled: %s", new Object[] { branchFilter }));
 	    logger.debug(String.format("\tBranch filter regex: %s", new Object[] { branchFilterRegex }));
 		logger.debug(String.format("\tBuild started: %s", buildStarted));		
@@ -162,7 +139,7 @@ public class MSTeamsConfigurationController extends BaseController {
 		logger.debug(String.format("\tBuild failed: %s", buildFailed));
 		logger.debug(String.format("\t\tOnly after first: %s", onlyAfterFirstBuildFailed));
 		logger.debug(String.format("\tBuild interrupted: %s", buildInterrupted));
-		logger.debug(String.format("\tServer event room ID: %s", serverEventRoomId));
+		logger.debug(String.format("\tServer event URL: %s", serverEventChannelUrl));
 		logger.debug(String.format("\tServer startup: %s", serverStartup));
 		logger.debug(String.format("\tServer shutdown: %s", serverShutdown));
 		logger.debug("Templates:");
@@ -187,12 +164,9 @@ public class MSTeamsConfigurationController extends BaseController {
 		}
 
 		// Save the configuration
-		this.configuration.setApiUrl(apiUrl);
-		this.configuration.setBypassSslCheck(Boolean.parseBoolean(bypassSslCheck));
-		this.configuration.setApiToken(apiToken);
 		this.configuration.setNotifyStatus(Boolean.parseBoolean(notify));
-		this.configuration.setDefaultRoomId(defaultRoomId.equals("") ? null : defaultRoomId);
-		this.configuration.setServerEventRoomId(serverEventRoomId.equals("") ? null : serverEventRoomId);
+		this.configuration.setDefaultChannelUrl(defaultChannelUrl.equals("") ? null : defaultChannelUrl);
+		this.configuration.setServerEventChannelUrl(serverEventChannelUrl.equals("") ? null : serverEventChannelUrl);
 	    this.configuration.setBranchFilterEnabledStatus(Boolean.parseBoolean(branchFilter));
 	    this.configuration.setBranchFilterRegex(branchFilterRegex.equals("") ? null : branchFilterRegex);
 		MSTeamsEventConfiguration events = new MSTeamsEventConfiguration();
@@ -220,14 +194,11 @@ public class MSTeamsConfigurationController extends BaseController {
 	}
 	
 	private void handleTestConnection(HttpServletRequest request, HttpServletResponse response) {
-		logger.debug("Testing authentication");
-		String apiUrl = request.getParameter(MSTeamsConfiguration.API_URL_KEY);
-		String apiToken = request.getParameter(MSTeamsConfiguration.API_TOKEN_KEY);
-		logger.debug(String.format("API URL: %s", apiUrl));
-		logger.debug(String.format("API token: %s", apiToken));
-		this.configuration.setApiUrl(apiUrl);
-		this.configuration.setApiToken(apiToken);
-		boolean result = this.processor.testAuthentication();
+		logger.debug("Sending a test message");
+		// Figure out which URL we were given to test
+		String channelUrl = request.getParameter(MSTeamsConfiguration.CHANNEL_URL_KEY);
+		logger.debug(String.format("Channel URL: %s", channelUrl));
+		boolean result = this.processor.testCommunication(channelUrl);
 		logger.debug(String.format("Authentication status: %s", result));
 		if (result) {
 			response.setStatus(HttpStatus.SC_OK);
@@ -242,10 +213,6 @@ public class MSTeamsConfigurationController extends BaseController {
 		logger.debug(String.format("Disabled status: %s", disabled));
 		this.configuration.setDisabledStatus(disabled);
 		this.saveConfiguration();
-	}
-	
-	private void handleReloadEmoticons(HttpServletRequest request) {
-		this.emoticonCache.reload();
 	}
 	
 	@Override
@@ -264,9 +231,6 @@ public class MSTeamsConfigurationController extends BaseController {
 			} else if (request.getParameter(ACTION_PARAMETER) != null) {
 				logger.debug("Changing plugin status");
 				this.handlePluginStatusChange(request);
-			} else if (request.getParameter(RELOAD_EMOTICONS_PARAMTER) != null) {
-				logger.debug("Reload emoticons");
-				this.handleReloadEmoticons(request);
 			} else {
 				logger.debug("No handler for request:");
 				@SuppressWarnings("unchecked")
@@ -282,43 +246,20 @@ public class MSTeamsConfigurationController extends BaseController {
 		return null;
 	}
 
-	public void initialise() {
+	public void initialize() {
 		try {
 			File file = new File(this.configFilePath);
 			if (file.exists()) {
 				logger.debug("Loading existing configuration");
-				this.upgradeConfigurationFromV0dot1ToV0dot2();
 				this.loadConfiguration();
 			} else {
 				logger.debug("No configuration file exists; creating new one");
 				this.saveConfiguration();
 			}
-			this.emoticonCache.reload();
 		} catch (Exception e) {
 			logger.error("Could not load configuration", e);
 		}
 		logger.info("Controller initialised");
-	}
-
-	private void upgradeConfigurationFromV0dot1ToV0dot2() throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError, TransformerException {
-		File configFile = new File(this.configFilePath);
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.parse(configFile);
-		Element rootElement = document.getDocumentElement();
-		NodeList nodes = rootElement.getChildNodes();
-		for (int i = 0; i < nodes.getLength(); i++) {
-			if (nodes.item(i).getNodeName().equals(MSTeamsConfiguration.DEFAULT_ROOM_ID_KEY_V0DOT1)) {
-				Element roomElement = (Element)nodes.item(i);
-				document.renameNode(roomElement, roomElement.getNamespaceURI(), MSTeamsConfiguration.DEFAULT_ROOM_ID_KEY);
-			}
-		}
-
-		// Save
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		Result output = new StreamResult(configFile);
-		Source input = new DOMSource(document);
-		transformer.transform(input, output);
 	}
 	
 	public void loadConfiguration() throws IOException {
@@ -332,15 +273,12 @@ public class MSTeamsConfigurationController extends BaseController {
 		
 		// Copy the values, because we need it on the original shared (bean),
 		// which is a singleton
-		this.configuration.setApiUrl(configuration.getApiUrl());
-		this.configuration.setApiToken(configuration.getApiToken());
-		this.configuration.setDefaultRoomId(configuration.getDefaultRoomId());
+		this.configuration.setDefaultChannelUrl(configuration.getDefaultChannelUrl());
 		this.configuration.setNotifyStatus(configuration.getDefaultNotifyStatus());
 		this.configuration.setDisabledStatus(configuration.getDisabledStatus());
 		this.configuration.setBranchFilterEnabledStatus(configuration.getBranchFilterEnabledStatus());
 		this.configuration.setBranchFilterRegex(configuration.getBranchFilterRegex());
-		this.configuration.setBypassSslCheck(configuration.getBypassSslCheck());
-		this.configuration.setServerEventRoomId(configuration.getServerEventRoomId());
+		this.configuration.setServerEventChannelUrl(configuration.getServerEventChannelUrl());
 		if (configuration.getEvents() != null) {
 			this.configuration.getEvents().setBuildStartedStatus(configuration.getEvents().getBuildStartedStatus());
 			this.configuration.getEvents().setBuildSuccessfulStatus(configuration.getEvents().getBuildSuccessfulStatus());

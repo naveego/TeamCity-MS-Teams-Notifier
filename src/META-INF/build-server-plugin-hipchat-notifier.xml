@@ -9,5 +9,5 @@
   <bean id="MSTeamsServerExtension" class="com.foxgang.teamcity.msTeams.MSTeamsServerExtension" init-method="register"/>
   <bean id="msTeamsAdminPage" class="com.foxgang.teamcity.msTeams.MSTeamsConfigurationPageExtension"/>
   <bean id="MSTeamsEmoticonCache" class="com.foxgang.teamcity.msTeams.MSTeamsEmoticonCache"/>
-  <bean id="MSTeamsConfigurationController" class="com.foxgang.teamcity.msTeams.MSTeamsConfigurationController" init-method="initialise"/>
+  <bean id="MSTeamsConfigurationController" class="com.foxgang.teamcity.msTeams.MSTeamsConfigurationController" init-method="initialize"/>
 </beans>

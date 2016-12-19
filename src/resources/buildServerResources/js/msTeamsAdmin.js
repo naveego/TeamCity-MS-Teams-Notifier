@@ -19,9 +19,10 @@ var msTeamsProject = {
 		BS.ajaxRequest($("msTeamsProjectForm").action, {
 			parameters : 
 				"project=1" + 
-				"&roomId="    + $("roomId").value +
-				"&notify="    + $("notify").checked + 
-				"&projectId=" + $("projectId").value,
+				"&channelUrl="    + $("#channelUrl").value +
+				"&notify="    + $("#notify").checked +
+				"&enabled="    + $("#enabled").checked +
+				"&projectId=" + $("#projectId").value,
 			onComplete : function(transport) {
 				if (transport.responseXML) {
 					BS.XMLResponse.processErrors(transport.responseXML, {
@@ -34,45 +35,44 @@ var msTeamsProject = {
 			}
 		});
 		return false;
-	}
+	},
+	testConnection : function() {
+		jQuery.ajax(
+				{
+					url: $("msTeamsProjectForm").action, 
+					data: {
+							test: 1,
+							channelUrl: $("#channelUrl").value
+						  },
+					type: "GET"
+				}).done(function() {
+					alert("Notification successful!");
+				}).fail(function() {
+					alert("Notification failed!")
+				});
+		return false;
+	},
 };
 
 var msTeamsAdmin = {
-	validate : function() {
-		var apiUrl = document.forms["msTeamsForm"]["apiUrl"].value;
-		var apiToken = document.forms["msTeamsForm"]["apiToken"].value;                  
-		if (apiUrl == null || apiUrl == "" || apiToken == null || apiToken == "") {
-			alert("You must specify a value for both the API URL and token.");
-			return false;
-		}
-		return true;
-	},
-		
-	save : function() {
-		if (!msTeamsAdmin.validate()) {
-			return false;
-		}
-		
+	save : function() {		
 		BS.ajaxRequest($("msTeamsForm").action, {
 			method : "POST",
 			parameters : 
 				"edit=1" + 
-				"&apiUrl="                        + $("apiUrl").value + 
-				"&bypassSslCheck="                + $("bypassSslCheck").checked +
-				"&apiToken="                      + $("apiToken").value +
-				"&defaultRoomId="                 + $("defaultRoomId").value +
-				"&serverEventRoomId="             + $("serverEventRoomId").value +
-				"&notify="                        + $("notify").checked + 
-				"&branchFilter="                  + $("branchFilter").checked + 
-				"&branchFilterRegex="             + $("branchFilterRegex").value + 
-				"&buildStarted="                  + $("buildStarted").checked +
-				"&buildSuccessful="               + $("buildSuccessful").checked +
-				"&buildFailed="                   + $("buildFailed").checked +
-				"&buildInterrupted="              + $("buildInterrupted").checked +
-				"&serverStartup="                 + $("serverStartup").checked +
-				"&serverShutdown="                + $("serverShutdown").checked + 
-				"&onlyAfterFirstBuildSuccessful=" + $("onlyAfterFirstBuildSuccessful").checked +
-				"&onlyAfterFirstBuildFailed="     + $("onlyAfterFirstBuildFailed").checked + 				
+				"&defaultChannelUrl="             + $("#defaultChannelUrl").value +
+				"&serverEventChannelUrl="         + $("#serverEventChannelUrl").value +
+				"&notify="                        + $("#notify").checked + 
+				"&branchFilter="                  + $("#branchFilter").checked + 
+				"&branchFilterRegex="             + $("#branchFilterRegex").value + 
+				"&buildStarted="                  + $("#buildStarted").checked +
+				"&buildSuccessful="               + $("#buildSuccessful").checked +
+				"&buildFailed="                   + $("#buildFailed").checked +
+				"&buildInterrupted="              + $("#buildInterrupted").checked +
+				"&serverStartup="                 + $("#serverStartup").checked +
+				"&serverShutdown="                + $("#serverShutdown").checked + 
+				"&onlyAfterFirstBuildSuccessful=" + $("#onlyAfterFirstBuildSuccessful").checked +
+				"&onlyAfterFirstBuildFailed="     + $("#onlyAfterFirstBuildFailed").checked + 				
 				"&buildStartedTemplate="          + encodeURIComponent(document.getElementById('buildStartedTemplate').value) +
 				"&buildSuccessfulTemplate="       + encodeURIComponent(document.getElementById('buildSuccessfulTemplate').value) +
 				"&buildFailedTemplate="           + encodeURIComponent(document.getElementById('buildFailedTemplate').value) +
@@ -93,45 +93,35 @@ var msTeamsAdmin = {
 		return false;
 	},
 	
-	testConnection : function() {
-		if (!msTeamsAdmin.validate()) {
-			return false;
-		}
-		
+	testServerEventsConnection : function() {
 		jQuery.ajax(
 				{
 					url: $("msTeamsForm").action, 
 					data: {
 							test: 1, 
-							apiUrl: $("apiUrl").value,
-							apiToken: $("apiToken").value
+							channelUrl: $("#serverEventChannelUrl").value
 						  },
 					type: "GET"
 				}).done(function() {
-					alert("Connection successful!");
+					alert("Notification successful!");
 				}).fail(function() {
-					alert("Connection failed!")
+					alert("Notification failed!")
 				});
 		return false;
 	},
-	
-	reloadEmoticons : function() {
-		if (!msTeamsAdmin.validate()) {
-			return false;
-		}
-		
+	testDefaultConnection : function() {
 		jQuery.ajax(
 				{
 					url: $("msTeamsForm").action, 
 					data: {
-							reloadEmoticons: 1
+							test: 1, 
+							channelUrl: $("#defaultChannelUrl").value
 						  },
 					type: "GET"
 				}).done(function() {
-					alert("Reload successful!");
-					BS.reload(true);
+					alert("Notification successful!");
 				}).fail(function() {
-					alert("Reload failed!")
+					alert("Notification failed!")
 				});
 		return false;
 	}

@@ -39,22 +39,18 @@ public class MSTeamsConfigurationPageExtension extends AdminPage {
 	private static final String AFTER_PAGE_ID = "jabber";
 	private static final String BEFORE_PAGE_ID = "clouds";
 	private static final String PAGE = "adminSettings.jsp";
-	private static final String PLUGIN_NAME = "msTeams";
+	private static final String PLUGIN_NAME = "Microsoft Teams";
 
-	private static final String TAB_TITLE = "msTeams Notifier";
-	private static final String ROOM_ID_LIST = "roomIdList";
+	private static final String TAB_TITLE = "MSTeams Notifier";
 	private MSTeamsConfiguration configuration;
-	private MSTeamsApiProcessor processor;
 	private MSTeamsNotificationMessageTemplates templates;
-	private MSTeamsEmoticonCache emoticonCache;
 
 	public MSTeamsConfigurationPageExtension(@NotNull PagePlaces pagePlaces, 
 			@NotNull PluginDescriptor descriptor, 
 			@NotNull MSTeamsConfiguration configuration, 
 			@NotNull MSTeamsApiProcessor processor,
 			@NotNull MSTeamsNotificationMessageTemplates templates,
-			@NotNull MSTeamsServerExtension serverExtension,
-			@NotNull MSTeamsEmoticonCache emoticonCache) {
+			@NotNull MSTeamsServerExtension serverExtension) {
 		super(pagePlaces);
 		setPluginName(PLUGIN_NAME);
 		setIncludeUrl(descriptor.getPluginResourcesPath(PAGE));
@@ -65,9 +61,7 @@ public class MSTeamsConfigurationPageExtension extends AdminPage {
 		before.add(BEFORE_PAGE_ID);
 		setPosition(PositionConstraint.between(after, before));
 		this.configuration = configuration;
-		this.processor = processor;
 		this.templates = templates;
-		this.emoticonCache = emoticonCache;
 		register();
 		logger.info("Global configuration page registered");
 	}
@@ -75,19 +69,10 @@ public class MSTeamsConfigurationPageExtension extends AdminPage {
 	@Override
 	public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
 		super.fillModel(model, request);
-		model.put(MSTeamsConfiguration.API_URL_KEY, this.configuration.getApiUrl());
-		logger.debug(String.format("Bypass SSL check: %s", this.configuration.getBypassSslCheck()));
-		model.put(MSTeamsConfiguration.BYPASS_SSL_CHECK, this.configuration.getBypassSslCheck());
-		model.put(MSTeamsConfiguration.API_TOKEN_KEY, this.configuration.getApiToken());
-		model.put(MSTeamsConfiguration.DEFAULT_ROOM_ID_KEY, this.configuration.getDefaultRoomId());
-		model.put(MSTeamsConfiguration.SERVER_EVENT_ROOM_ID_KEY, this.configuration.getDefaultRoomId());
-		if (this.configuration.getServerEventRoomId() != null) {
-			model.put(MSTeamsConfiguration.SERVER_EVENT_ROOM_ID_KEY, this.configuration.getServerEventRoomId());
-		}
-		model.put(ROOM_ID_LIST, Utils.getRooms(this.processor));
+		model.put(MSTeamsConfiguration.DEFAULT_CHANNEL_URL_KEY, this.configuration.getDefaultChannelUrl());
+		model.put(MSTeamsConfiguration.SERVER_EVENT_CHANNEL_URL_KEY, this.configuration.getServerEventChannelUrl());
 		model.put(MSTeamsConfiguration.NOTIFY_STATUS_KEY, this.configuration.getDefaultNotifyStatus());
 		model.put(MSTeamsConfiguration.DISABLED_STATUS_KEY, this.configuration.getDisabledStatus());
-		model.put(MSTeamsConfiguration.EMOTICON_CACHE_SIZE_KEY, this.emoticonCache.getSize());
 	    model.put(MSTeamsConfiguration.BRANCH_FILTER_KEY, Boolean.valueOf(this.configuration.getBranchFilterEnabledStatus()));
 	    model.put(MSTeamsConfiguration.BRANCH_FILTER_REGEX_KEY, this.configuration.getBranchFilterRegex());
 

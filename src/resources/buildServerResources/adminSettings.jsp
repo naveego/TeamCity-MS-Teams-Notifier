@@ -46,66 +46,27 @@ limitations under the License.
 			<tr class="groupingTitle">
           		<td colspan="2">General Configuration</td>
         	</tr>
-			<tr>
-				<th>
-					<label for="apiUrl">API URL: <l:star /></label>
-				</th>
+        	<tr>
+				<th><label for="defaultChannelUrl">Default Webhook URL: </label></th>
 				<td>
-					<forms:textField name="apiUrl" value="${apiUrl}" style="width: 300px;" />
-					<span class="smallNote">This must be the base URL to the <a href="https://www.msTeams.com/docs/apiv2" target="_blank">msTeams version 2 API</a>.</span>
-					<forms:checkbox name="bypassSslCheck" id="bypassSslCheck" checked="${bypassSslCheck}" value="${bypassSslCheck}" 
-					onclick="if (this.checked) { jQuery('#bypassSslCheckText').css('color', '#C00'); jQuery('#bypassSslCheckWarning').show(); } else { jQuery('#bypassSslCheckText').css('color', '#888'); jQuery('#bypassSslCheckWarning').hide(); } return true;"/>
-					<span id="bypassSslCheckText" style="color: #888; font-size: 90%;">When checked, SSL certificate validation will be bypassed.</span>
-					<span id="bypassSslCheckWarning" style="color: #C00; font-size: 90%; display: none;">This option is intended exclusively for testing against 
-					a stand-alone msTeams server instance. By disabling certificate validation you are exposing yourself to man-in-the-middle attacks, among others.
-					Please install a valid certificate, or if using a self-signed certificate, add it to the Java keystore.</span>
-				</td>
+				  <textarea name="defaultChannelUrl" id="defaultChannelUrl">${defaultChannelUrl}</textarea>
+                  &nbsp;
+                  <a href="#" onclick="return msTeamsAdmin.save()">Save to reload</a>
+                </td>
+                <td><forms:submit id="testDefaultConnection" type="button" label="Post Test Message" onclick="return msTeamsAdmin.testDefaultConnection()"/></td>
 			</tr>
 			<tr>
 				<th>
-					<label for="apiToken">API token: <l:star /></label>
-				</th>
-				<td>
-					<forms:textField name="apiToken" value="${apiToken}" style="width: 300px;" />
-					<span class="smallNote">A user OAuth token for a dedicated build server user on msTeams.</span>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					<label for="notifyLabel">Trigger notifications: </label>
+					<label for="notify">Trigger notifications: </label>
 				</th>
 				<td>
 					<forms:checkbox name="notify" checked="${notify}" value="${notify}"/>
 					<span style="color: #888; font-size: 90%;">When checked, a notification for all people in the room will be triggered, taking user preferences into account.</span>
 				</td>
 			</tr>
-			<tr>
-				<th>
-					<label for="emoticonCache">Emoticon cache: </label>
-				</th>
-				<td>
-					${emoticonCacheSize} items&nbsp;&mdash;&nbsp;<a href="#" onclick="return msTeamsAdmin.reloadEmoticons()">Reload</a>
-				</td>
-			</tr>
 			<tr class="groupingTitle">
-          		<td colspan="2">Build Events Configuration&nbsp;<a href="http://www.whatsthatlight.com/index.php/projects/teamcity-msTeams-plugin/" class="helpIcon" style="vertical-align: middle;" target="_blank"><bs:helpIcon/></a></td>
+          		<td colspan="2">Build Events Configuration&nbsp;</td>
         	</tr>
-			<tr>
-				<!-- TODO: Automatically refresh this on URL or token change. -->
-				<th><label for="defaultRoomId">Default room: </label></th>
-				<td>
-				  <forms:select name="defaultRoomId">
-				  	<forms:option value="">(None)</forms:option>
-                    <c:forEach var="roomIdEntry" items="${roomIdList}">
-                      <forms:option value="${roomIdEntry.value}" selected="${roomIdEntry.value == defaultRoomId}">
-                        <c:out value="${roomIdEntry.key}"/>
-                      </forms:option>
-                    </c:forEach>
-                  </forms:select>
-                  &nbsp;
-                  <a href="#" onclick="return msTeamsAdmin.save()">Save to reload</a>
-                </td>
-			</tr>
 			<tr>
 				<th>
 					<label for="branchFilterLabel">Branch filter: </label>
@@ -165,23 +126,16 @@ limitations under the License.
 				</td>
 			</tr>
 			<tr class="groupingTitle">
-          		<td colspan="2">Server Events Configuration&nbsp;<a href="http://www.whatsthatlight.com/index.php/projects/teamcity-msTeams-plugin/" class="helpIcon" target="_blank"><bs:helpIcon/></a></td>
+          		<td colspan="2">Server Events Configuration&nbsp;</td>
         	</tr>
 			<tr>
-				<!-- TODO: Automatically refresh this on URL or token change. -->
-				<th><label for="serverEventRoomId">Room: </label></th>
+				<th><label for="serverEventChannelUrl">Webhook URL: </label></th>
 				<td>
-				  <forms:select name="serverEventRoomId">
-				  	<forms:option value="">(None)</forms:option>
-                    <c:forEach var="roomIdEntry" items="${roomIdList}">
-                      <forms:option value="${roomIdEntry.value}" selected="${roomIdEntry.value == serverEventRoomId}">
-                        <c:out value="${roomIdEntry.key}"/>
-                      </forms:option>
-                    </c:forEach>
-                  </forms:select>
+				  <textarea name="serverEventChannelUrl" id="serverEventChannelUrl">${serverEventChannelUrl}</textarea>
                   &nbsp;
                   <a href="#" onclick="return msTeamsAdmin.save()">Save to reload</a>
                 </td>
+                <td><forms:submit id="testServerEventsConnection" type="button" label="Post Test Message" onclick="return msTeamsAdmin.testServerEventsConnection()"/></td>
 			</tr>
 			<tr>
 				<th><label for="serverStartupLabel">Server startup: </label></th>
@@ -206,7 +160,6 @@ limitations under the License.
 		</table>
 		<div class="saveButtonsBlock">
 			<forms:submit label="Save" />
-			<forms:submit id="testConnection" type="button" label="Test connection" onclick="return msTeamsAdmin.testConnection()"/>
 			<forms:saving />
 		</div>
 	</div>
@@ -215,14 +168,6 @@ limitations under the License.
 <bs:linkScript>
     ${teamcityPluginResourcesPath}js/msTeamsAdmin.js
 </bs:linkScript>
-
-<script type="text/javascript">
-	jQuery(document).ready(function() {
-		if (${bypassSslCheck}) {
-			jQuery('#bypassSslCheckText').css('color', '#C00'); jQuery('#bypassSslCheckWarning').show();
-		}		
-	});
-</script>
 
 <script type="text/javascript">
 	(function($) {
