@@ -5,7 +5,7 @@
     <name>Microsoft Teams Notifier</name>
     <display-name>Microsoft Teams Notifier</display-name>
     <!-- <description>Some description goes here</description> -->
-    <version>0.9.2</version>
+    <version>0.0.1</version>
     <vendor>
       <name>Tyler Evert</name>
       <url>http://thefoxgang.com/</url>
