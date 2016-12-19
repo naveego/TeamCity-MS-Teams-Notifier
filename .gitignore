@@ -3,10 +3,10 @@
 /classes
 .DS_Store
 MANIFEST.MF
-hipchat.xml
+msTeams.xml
 /reports
-/hipchat
-/hipchat.bak
+/msTeams
+/msTeams.bak
 /test-output
 /testng
 /coverage

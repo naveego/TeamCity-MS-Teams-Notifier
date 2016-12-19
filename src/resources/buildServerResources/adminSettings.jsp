@@ -1,5 +1,5 @@
 <!--
-Copyright 2014 Pieter Rautenbach
+Copyright 2016 Tyler Evert
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@ limitations under the License.
 
 <%@ include file="/include.jsp"%>
 
-<c:url value="/configureHipChat.html" var="actionUrl" />
+<c:url value="/configureMSTeams.html" var="actionUrl" />
 
 <bs:linkCSS dynamic="${true}">
-  ${teamcityPluginResourcesPath}css/hipChatAdmin.css
+  ${teamcityPluginResourcesPath}css/msTeamsAdmin.css
 </bs:linkCSS>
 
-<form action="${actionUrl}" id="hipChatForm" method="POST"
-	onsubmit="return HipChatAdmin.save()">
+<form action="${actionUrl}" id="msTeamsForm" method="POST"
+	onsubmit="return msTeamsAdmin.save()">
 	<div class="editNotificatorSettingsPage">
 		<c:choose>
 			<c:when test="${disabled}">
 				<div class="pauseNote" style="margin-bottom: 1em;">
-					The notifier is <strong>disabled</strong>. All HipChat
+					The notifier is <strong>disabled</strong>. All msTeams
 					notifications are suspended.&nbsp;&nbsp;<a class="btn btn_mini"
 						href="#" id="enable-btn">Enable</a>
 				</div>
@@ -52,12 +52,12 @@ limitations under the License.
 				</th>
 				<td>
 					<forms:textField name="apiUrl" value="${apiUrl}" style="width: 300px;" />
-					<span class="smallNote">This must be the base URL to the <a href="https://www.hipchat.com/docs/apiv2" target="_blank">HipChat version 2 API</a>.</span>
+					<span class="smallNote">This must be the base URL to the <a href="https://www.msTeams.com/docs/apiv2" target="_blank">msTeams version 2 API</a>.</span>
 					<forms:checkbox name="bypassSslCheck" id="bypassSslCheck" checked="${bypassSslCheck}" value="${bypassSslCheck}" 
 					onclick="if (this.checked) { jQuery('#bypassSslCheckText').css('color', '#C00'); jQuery('#bypassSslCheckWarning').show(); } else { jQuery('#bypassSslCheckText').css('color', '#888'); jQuery('#bypassSslCheckWarning').hide(); } return true;"/>
 					<span id="bypassSslCheckText" style="color: #888; font-size: 90%;">When checked, SSL certificate validation will be bypassed.</span>
 					<span id="bypassSslCheckWarning" style="color: #C00; font-size: 90%; display: none;">This option is intended exclusively for testing against 
-					a stand-alone HipChat server instance. By disabling certificate validation you are exposing yourself to man-in-the-middle attacks, among others.
+					a stand-alone msTeams server instance. By disabling certificate validation you are exposing yourself to man-in-the-middle attacks, among others.
 					Please install a valid certificate, or if using a self-signed certificate, add it to the Java keystore.</span>
 				</td>
 			</tr>
@@ -67,7 +67,7 @@ limitations under the License.
 				</th>
 				<td>
 					<forms:textField name="apiToken" value="${apiToken}" style="width: 300px;" />
-					<span class="smallNote">A user OAuth token for a dedicated build server user on HipChat.</span>
+					<span class="smallNote">A user OAuth token for a dedicated build server user on msTeams.</span>
 				</td>
 			</tr>
 			<tr>
@@ -84,11 +84,11 @@ limitations under the License.
 					<label for="emoticonCache">Emoticon cache: </label>
 				</th>
 				<td>
-					${emoticonCacheSize} items&nbsp;&mdash;&nbsp;<a href="#" onclick="return HipChatAdmin.reloadEmoticons()">Reload</a>
+					${emoticonCacheSize} items&nbsp;&mdash;&nbsp;<a href="#" onclick="return msTeamsAdmin.reloadEmoticons()">Reload</a>
 				</td>
 			</tr>
 			<tr class="groupingTitle">
-          		<td colspan="2">Build Events Configuration&nbsp;<a href="http://www.whatsthatlight.com/index.php/projects/teamcity-hipchat-plugin/" class="helpIcon" style="vertical-align: middle;" target="_blank"><bs:helpIcon/></a></td>
+          		<td colspan="2">Build Events Configuration&nbsp;<a href="http://www.whatsthatlight.com/index.php/projects/teamcity-msTeams-plugin/" class="helpIcon" style="vertical-align: middle;" target="_blank"><bs:helpIcon/></a></td>
         	</tr>
 			<tr>
 				<!-- TODO: Automatically refresh this on URL or token change. -->
@@ -103,7 +103,7 @@ limitations under the License.
                     </c:forEach>
                   </forms:select>
                   &nbsp;
-                  <a href="#" onclick="return HipChatAdmin.save()">Save to reload</a>
+                  <a href="#" onclick="return msTeamsAdmin.save()">Save to reload</a>
                 </td>
 			</tr>
 			<tr>
@@ -165,7 +165,7 @@ limitations under the License.
 				</td>
 			</tr>
 			<tr class="groupingTitle">
-          		<td colspan="2">Server Events Configuration&nbsp;<a href="http://www.whatsthatlight.com/index.php/projects/teamcity-hipchat-plugin/" class="helpIcon" target="_blank"><bs:helpIcon/></a></td>
+          		<td colspan="2">Server Events Configuration&nbsp;<a href="http://www.whatsthatlight.com/index.php/projects/teamcity-msTeams-plugin/" class="helpIcon" target="_blank"><bs:helpIcon/></a></td>
         	</tr>
 			<tr>
 				<!-- TODO: Automatically refresh this on URL or token change. -->
@@ -180,7 +180,7 @@ limitations under the License.
                     </c:forEach>
                   </forms:select>
                   &nbsp;
-                  <a href="#" onclick="return HipChatAdmin.save()">Save to reload</a>
+                  <a href="#" onclick="return msTeamsAdmin.save()">Save to reload</a>
                 </td>
 			</tr>
 			<tr>
@@ -206,14 +206,14 @@ limitations under the License.
 		</table>
 		<div class="saveButtonsBlock">
 			<forms:submit label="Save" />
-			<forms:submit id="testConnection" type="button" label="Test connection" onclick="return HipChatAdmin.testConnection()"/>
+			<forms:submit id="testConnection" type="button" label="Test connection" onclick="return msTeamsAdmin.testConnection()"/>
 			<forms:saving />
 		</div>
 	</div>
 </form>
 
 <bs:linkScript>
-    ${teamcityPluginResourcesPath}js/hipChatAdmin.js
+    ${teamcityPluginResourcesPath}js/msTeamsAdmin.js
 </bs:linkScript>
 
 <script type="text/javascript">
@@ -231,7 +231,7 @@ limitations under the License.
 					function() {
 						BS.reload(true);
 					});
-			$('hipChatComponent').refresh();
+			$('msTeamsComponent').refresh();
 			return false;
 		};
 
@@ -242,7 +242,7 @@ limitations under the License.
 		$("#disable-btn")
 				.click(
 						function() {
-							if (!confirm("HipChat notifications will not be sent until enabled. Disable the notifier?"))
+							if (!confirm("msTeams notifications will not be sent until enabled. Disable the notifier?"))
 								return false;
 							return sendAction(false);
 						});

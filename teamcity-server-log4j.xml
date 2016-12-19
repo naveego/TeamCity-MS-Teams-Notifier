@@ -1,5 +1,5 @@
-  <appender name="ROLL.HIPCHAT.NOTIFIER" class="jetbrains.buildServer.util.TCRollingFileAppender">
-    <param name="file" value="${teamcity_logs}hipchat-notifier.log"/>
+  <appender name="ROLL.msTeams.NOTIFIER" class="jetbrains.buildServer.util.TCRollingFileAppender">
+    <param name="file" value="${teamcity_logs}msTeams-notifier.log"/>
     <param name="maxBackupIndex" value="3"/>
     <!--REPLACE PREVIOUS LINE WITH UNCOMMENTED LINE TO STORE MORE LOGS-->
     <!-- <param name="maxBackupIndex" value="20"/> -->
@@ -9,8 +9,8 @@
     </layout>
   </appender>
 
-  <category name="com.whatsthatlight.teamcity.hipchat">
+  <category name="com.foxgang.teamcity.msTeams">
    <!-- Set this to DEBUG to enable debug logging -->
    <priority value="DEBUG"/>
-    <appender-ref ref="ROLL.HIPCHAT.NOTIFIER"/>
+    <appender-ref ref="ROLL.msTeams.NOTIFIER"/>
   </category>

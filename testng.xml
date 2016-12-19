@@ -3,17 +3,17 @@
 <suite name="Suite" parallel="none">
   <test name="Test">
     <classes>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.DummyTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatApiProcessorTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatConfigurationControllerTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatConfigurationPageExtensionTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatConfigurationTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatNotificationMessageTemplatesTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatServerExtensionTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.SimpleServerTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.UtilsTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatProjectSettingsTest"/>
-      <class name="com.whatsthatlight.teamcity.hipchat.test.HipChatEmoticonCacheTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.DummyTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsApiProcessorTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsConfigurationControllerTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsConfigurationPageExtensionTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsConfigurationTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsNotificationMessageTemplatesTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsServerExtensionTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.SimpleServerTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.UtilsTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsProjectSettingsTest"/>
+      <class name="com.foxgang.teamcity.msTeams.test.MSTeamsEmoticonCacheTest"/>
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->

@@ -1,5 +1,5 @@
 <!--
-Copyright 2014 Pieter Rautenbach
+Copyright 2016 Tyler Evert
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@ limitations under the License.
 
 <%@ include file="/include.jsp"%>
 
-<c:url value="/configureHipChat.html" var="actionUrl" />
+<c:url value="/configuremsTeams.html" var="actionUrl" />
 
 <bs:linkCSS dynamic="${true}">
-  ${teamcityPluginResourcesPath}css/hipChatAdmin.css
+  ${teamcityPluginResourcesPath}css/msTeamsAdmin.css
 </bs:linkCSS>
 
 <bs:linkScript>
-    ${teamcityPluginResourcesPath}js/hipChatAdmin.js
+    ${teamcityPluginResourcesPath}js/msTeamsAdmin.js
 </bs:linkScript>
 
-<form action="${actionUrl}" id="hipChatProjectForm" method="post"
-	onsubmit="return HipChatProject.save()">
+<form action="${actionUrl}" id="msTeamsProjectForm" method="post"
+	onsubmit="return msTeamsProject.save()">
 	<div class="editNotificatorSettingsPage">
 		<bs:messages key="configurationSaved" />
 		<table class="runnerFormTable">

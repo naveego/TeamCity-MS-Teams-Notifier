@@ -2,12 +2,12 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans default-autowire="constructor">
-  <bean id="hipChatConfiguration" class="com.whatsthatlight.teamcity.hipchat.HipChatConfiguration"/>
-  <bean id="hipChatNotificationMessageTemplates" class="com.whatsthatlight.teamcity.hipchat.HipChatNotificationMessageTemplates"/>  
-  <bean id="hipChatApiProcessor" class="com.whatsthatlight.teamcity.hipchat.HipChatApiProcessor"/>
-  <bean id="hipChatProjectSettings" class="com.whatsthatlight.teamcity.hipchat.HipChatProjectSettings"/>
-  <bean id="hipChatServerExtension" class="com.whatsthatlight.teamcity.hipchat.HipChatServerExtension" init-method="register"/>
-  <bean id="hipChatAdminPage" class="com.whatsthatlight.teamcity.hipchat.HipChatConfigurationPageExtension"/>
-  <bean id="hipChatEmoticonCache" class="com.whatsthatlight.teamcity.hipchat.HipChatEmoticonCache"/>
-  <bean id="hipChatConfigurationController" class="com.whatsthatlight.teamcity.hipchat.HipChatConfigurationController" init-method="initialise"/>
+  <bean id="MSTeamsConfiguration" class="com.foxgang.teamcity.msTeams.MSTeamsConfiguration"/>
+  <bean id="MSTeamsNotificationMessageTemplates" class="com.foxgang.teamcity.msTeams.MSTeamsNotificationMessageTemplates"/>  
+  <bean id="MSTeamsApiProcessor" class="com.foxgang.teamcity.msTeams.MSTeamsApiProcessor"/>
+  <bean id="MSTeamsProjectSettings" class="com.foxgang.teamcity.msTeams.MSTeamsProjectSettings"/>
+  <bean id="MSTeamsServerExtension" class="com.foxgang.teamcity.msTeams.MSTeamsServerExtension" init-method="register"/>
+  <bean id="msTeamsAdminPage" class="com.foxgang.teamcity.msTeams.MSTeamsConfigurationPageExtension"/>
+  <bean id="MSTeamsEmoticonCache" class="com.foxgang.teamcity.msTeams.MSTeamsEmoticonCache"/>
+  <bean id="MSTeamsConfigurationController" class="com.foxgang.teamcity.msTeams.MSTeamsConfigurationController" init-method="initialise"/>
 </beans>

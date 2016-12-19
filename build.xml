@@ -1,7 +1,7 @@
 <project name="lights-notifier" default="compile" basedir=".">
 	
 	<description>
-      TeamCity notifier plugin to send messages to a HipChat room.
+      TeamCity notifier plugin to send messages to a Microsoft Teams channel.
     </description>
 
 	<property environment="env"/>
@@ -10,7 +10,7 @@
 	<property name="resources" location="src/resources"/>
 	<property name="build" location="build"/>
 	<property name="reports" location="reports"/>
-	<property name="main-class" value="HipChatNotifier"/>
+	<property name="main-class" value="MSTeamsNotifier"/>
 	<!-- Default to 0.0.0.0 if no version specified -->
 	<condition property="version" value="${env.BUILD_NUMBER}" else="0.9.2">
 		<and>
@@ -29,7 +29,7 @@
 			</not>
 		</and>
 	</condition>
-	<property name="vendor" value="What's That Light?"/>
+	<property name="vendor" value="Tyler Evert"/>
 	<!-- Determines whether to include a version etc. in the JAR's filename -->
 	<condition property="jar" value="${main-class}-${version}-${tag-type}" else="${main-class}">
 		<matches string="${env.MUST_VERSION_ARTIFACTS}" pattern="^-?true|yes|1$" casesensitive="false"/>
@@ -40,7 +40,7 @@
 	<property name="junit.home" value="lib/junit"/>
 	<property name="manifest" value="MANIFEST.MF"/>
 	<property name="plugin.xml" value="teamcity-plugin.xml"/>
-	<property name="plugin-bean.xml" value="build-server-plugin-hipchat-notifier.xml"/>
+	<property name="plugin-bean.xml" value="build-server-plugin-msTeams-notifier.xml"/>
 	<property name="versiontag" value="&lt;version&gt;${version}&lt;/version&gt;"/>
 	<property name="coverage.dir" value="coverage" />
 	<property name="testng.dir" value="testng" />
@@ -115,7 +115,7 @@
 	<!-- http://stackoverflow.com/questions/52984/how-do-i-generate-emma-code-coverage-reports-using-ant -->
 	<target name="emma" description="turns on EMMA's on-the-fly instrumentation mode" >
 	    <property name="emma.enabled" value="true" />
-		<property name="emma.filter" value="-com.whatsthatlight.teamcity.hipchat.test.*"/>
+		<property name="emma.filter" value="-com.foxgang.teamcity.msTeams.test.*"/>
     </target>
 	
 	<target name="test" depends="emma,compile" description="Run tests">

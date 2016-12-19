@@ -1,3 +1,4 @@
+/**
 Copyright 2016 Tyler Evert
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,3 +12,26 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+ */
+
+package com.foxgang.teamcity.msTeams;
+
+public class MSTeamsMessageBundle {
+
+	private String[] emoticonSet;
+	private String colour;
+	
+	public MSTeamsMessageBundle(String[] emoticonSet, String colour) {
+		this.emoticonSet = emoticonSet;
+		this.colour = colour;
+	}
+	
+	public String[] getEmoticonSet() {
+		return this.emoticonSet;
+	}
+
+	public String getColour() {
+		return this.colour;
+	}
+
+}
