@@ -40,7 +40,6 @@ public class MSTeamsNotificationMessageTemplates {
 		public static final String FULL_NAME = "fullName";
 		public static final String BUILD_NUMBER = "buildNumber";
 		public static final String TRIGGERED_BY = "triggeredBy";
-		public static final String EMOTICON_URL = "emoticonUrl";
 		public static final String CANCELLED_BY = "cancelledBy";
 		public static final String CONTRIBUTORS = "contributors";
 		public static final String BRANCH = "branch";
@@ -72,10 +71,10 @@ public class MSTeamsNotificationMessageTemplates {
 	public static final String SERVER_STARTUP_TEMPLATE_DEFAULT_KEY = "serverStartupTemplateDefault";
 	public static final String SERVER_SHUTDOWN_TEMPLATE_DEFAULT_KEY = "serverShutdownTemplateDefault";	
 
-	public static final String BUILD_STARTED_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> has started. This is build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was triggered by ${triggeredBy}. <#if hasContributors>Contributors: ${contributors}.</#if> <img src=\"${emoticonUrl}\">";
-	public static final String BUILD_SUCCESSFUL_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> was successful. It was build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was triggered by ${triggeredBy}. <#if hasContributors>Contributors: ${contributors}.</#if> <img src=\"${emoticonUrl}\">";
-	public static final String BUILD_FAILED_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> failed. It was build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was triggered by ${triggeredBy}. <#if hasContributors>Contributors: ${contributors}.</#if> <img src=\"${emoticonUrl}\">";
-	public static final String BUILD_INTERRUPTED_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> was cancelled. It was build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was cancelled by ${cancelledBy}. <img src=\"${emoticonUrl}\">";
+	public static final String BUILD_STARTED_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> has started. This is build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was triggered by ${triggeredBy}. <#if hasContributors>Contributors: ${contributors}.</#if>";
+	public static final String BUILD_SUCCESSFUL_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> was successful. It was build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was triggered by ${triggeredBy}. <#if hasContributors>Contributors: ${contributors}.</#if>";
+	public static final String BUILD_FAILED_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> failed. It was build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was triggered by ${triggeredBy}. <#if hasContributors>Contributors: ${contributors}.</#if>";
+	public static final String BUILD_INTERRUPTED_DEFAULT_TEMPLATE = "Build <a href=\"${serverUrl}/viewType.html?buildTypeId=${buildTypeId}\">${fullName}</a> <#if hasBranch>on branch <b>${branch}</b></#if> was cancelled. It was build number <a href=\"${serverUrl}/viewLog.html?buildId=${buildId}\">#${buildNumber}</a> and was cancelled by ${cancelledBy}.";
 	public static final String SERVER_STARTUP_DEFAULT_TEMPLATE = "Build server started.";
 	public static final String SERVER_SHUTDOWN_DEFAULT_TEMPLATE = "Build server shutting down.";
 		

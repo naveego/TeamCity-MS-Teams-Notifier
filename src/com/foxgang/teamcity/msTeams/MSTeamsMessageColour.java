@@ -18,10 +18,9 @@ package com.foxgang.teamcity.msTeams;
 
 public class MSTeamsMessageColour {
 
-	public static final String WARNING = "purple";
-	public static final String ERROR = "red";
-	public static final String SUCCESS = "green";
-	public static final String NEUTRAL = "gray";
-	public static final String INFO = "yellow";
-
+	public static final String WARNING = "E0E809";
+	public static final String ERROR = "E50909";
+	public static final String SUCCESS = "48A555";
+	public static final String NEUTRAL = "CEd6E2";
+	public static final String INFO = "6292E0";
 }

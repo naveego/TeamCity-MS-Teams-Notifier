@@ -48,7 +48,6 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 	private SBuildServer server;
 	private MSTeamsConfiguration configuration;
 	private MSTeamsApiProcessor processor;
-	private String messageFormat;
 	private HashMap<TeamCityEvent, MSTeamsMessageBundle> eventMap;
 	private MSTeamsNotificationMessageTemplates templates;
 
@@ -57,25 +56,22 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 			@NotNull MSTeamsApiProcessor processor, 
 			@NotNull MSTeamsNotificationMessageTemplates templates) {
 		this.server = server;
-		//this.configDirectory = serverPaths.getConfigDir();
 		this.configuration = configuration;
 		this.processor = processor;
 		this.templates = templates;
-		this.messageFormat = MSTeamsMessageFormat.HTML;
 		this.eventMap = new HashMap<TeamCityEvent, MSTeamsMessageBundle>();
-		this.eventMap.put(TeamCityEvent.BUILD_STARTED, new MSTeamsMessageBundle(MSTeamsEmoticonSet.POSITIVE, MSTeamsMessageColour.INFO));
-		this.eventMap.put(TeamCityEvent.BUILD_SUCCESSFUL, new MSTeamsMessageBundle(MSTeamsEmoticonSet.POSITIVE, MSTeamsMessageColour.SUCCESS));
-		this.eventMap.put(TeamCityEvent.BUILD_FAILED, new MSTeamsMessageBundle(MSTeamsEmoticonSet.NEGATIVE, MSTeamsMessageColour.ERROR));
-		this.eventMap.put(TeamCityEvent.BUILD_INTERRUPTED, new MSTeamsMessageBundle(MSTeamsEmoticonSet.INDIFFERENT, MSTeamsMessageColour.WARNING));
-		this.eventMap.put(TeamCityEvent.SERVER_STARTUP, new MSTeamsMessageBundle(null, MSTeamsMessageColour.NEUTRAL));
-		this.eventMap.put(TeamCityEvent.SERVER_SHUTDOWN,new MSTeamsMessageBundle(null, MSTeamsMessageColour.NEUTRAL));
+		this.eventMap.put(TeamCityEvent.BUILD_STARTED, new MSTeamsMessageBundle(MSTeamsMessageColour.INFO));
+		this.eventMap.put(TeamCityEvent.BUILD_SUCCESSFUL, new MSTeamsMessageBundle(MSTeamsMessageColour.SUCCESS));
+		this.eventMap.put(TeamCityEvent.BUILD_FAILED, new MSTeamsMessageBundle(MSTeamsMessageColour.ERROR));
+		this.eventMap.put(TeamCityEvent.BUILD_INTERRUPTED, new MSTeamsMessageBundle(MSTeamsMessageColour.WARNING));
+		this.eventMap.put(TeamCityEvent.SERVER_STARTUP, new MSTeamsMessageBundle(MSTeamsMessageColour.NEUTRAL));
+		this.eventMap.put(TeamCityEvent.SERVER_SHUTDOWN,new MSTeamsMessageBundle(MSTeamsMessageColour.NEUTRAL));
 		logger.debug("Server extension created");
 	}
 
 	public void register() {
 		this.server.addListener(this);
 		logger.debug("Server extension registered");
-		//this.controller.IsInitialised();
 	}
 	
 	@Override
@@ -143,11 +139,10 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 	
 	private void processServerEvent(TeamCityEvent event) {
 		try {
-			boolean notify = this.configuration.getDefaultNotifyStatus();
 			MSTeamsMessageBundle bundle = this.eventMap.get(event);
 			String colour = bundle.getColour();
 			String message = renderTemplate(this.templates.readTemplate(event), new HashMap<String, Object>());
-			MSTeamsRoomNotification notification = new MSTeamsRoomNotification(message, this.messageFormat, colour, notify);
+			MSTeamsRoomNotification notification = new MSTeamsRoomNotification("Title TBD", message, colour);
 			String roomId = this.configuration.getDefaultChannelUrl();
 			if ((event == TeamCityEvent.SERVER_STARTUP || event == TeamCityEvent.SERVER_SHUTDOWN) && 
 					this.configuration.getServerEventChannelUrl() != null) {
@@ -186,7 +181,7 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 				boolean notify = projectConfiguration.getNotifyStatus();
 				boolean enabled = projectConfiguration.getEnabled();
 				
-				MSTeamsRoomNotification notification = new MSTeamsRoomNotification(message, this.messageFormat, colour, notify);
+				MSTeamsRoomNotification notification = new MSTeamsRoomNotification("Title TBD", message, colour);
 				
 				if (enabled) {
 					logger.debug(String.format("Channel to be notified: %s", channelUrl));

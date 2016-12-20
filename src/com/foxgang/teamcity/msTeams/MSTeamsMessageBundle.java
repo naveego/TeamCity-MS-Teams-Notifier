@@ -18,16 +18,10 @@ package com.foxgang.teamcity.msTeams;
 
 public class MSTeamsMessageBundle {
 
-	private String[] emoticonSet;
 	private String colour;
 	
-	public MSTeamsMessageBundle(String[] emoticonSet, String colour) {
-		this.emoticonSet = emoticonSet;
+	public MSTeamsMessageBundle(String colour) {
 		this.colour = colour;
-	}
-	
-	public String[] getEmoticonSet() {
-		return this.emoticonSet;
 	}
 
 	public String getColour() {

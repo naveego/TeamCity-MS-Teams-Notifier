@@ -21,28 +21,24 @@ import org.codehaus.jackson.annotate.JsonProperty;
 // See: https://www.msTeams.com/docs/apiv2/method/send_room_notification
 public class MSTeamsRoomNotification {
 
-	@JsonProperty("color")
+	@JsonProperty("themeColor")
 	public String color;
 
-	@JsonProperty("message")
+	@JsonProperty("text")
 	public String message;
-
-	@JsonProperty("message_format")
-	public String messageFormat;
-
-	@JsonProperty("notify")
-	public boolean notify;
-
-	public MSTeamsRoomNotification(String message, String messageFormat, String color, boolean notify) {
+	
+	@JsonProperty("title")
+	public String title;
+	
+	public MSTeamsRoomNotification(String title, String message, String color) {
 		this.message = message;
-		this.messageFormat = messageFormat;
+		this.title = title;
 		this.color = color;
-		this.notify = notify;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Message: '%s'\nFormat: %s\nColor: %s\nNotify: %s", message, messageFormat, color, notify);
+		return String.format("Title: '%s'\nMessage: '%s'\nColor: %s", title, message, color);
 	}
 
 }

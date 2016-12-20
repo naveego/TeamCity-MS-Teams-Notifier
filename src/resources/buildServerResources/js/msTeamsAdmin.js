@@ -19,10 +19,10 @@ var msTeamsProject = {
 		BS.ajaxRequest($("msTeamsProjectForm").action, {
 			parameters : 
 				"project=1" + 
-				"&channelUrl="    + $("#channelUrl").value +
-				"&notify="    + $("#notify").checked +
-				"&enabled="    + $("#enabled").checked +
-				"&projectId=" + $("#projectId").value,
+				"&channelUrl="    + $("channelUrl").value +
+				"&notify="    + $("notify").checked +
+				"&enabled="    + $("enabled").checked +
+				"&projectId=" + $("projectId").value,
 			onComplete : function(transport) {
 				if (transport.responseXML) {
 					BS.XMLResponse.processErrors(transport.responseXML, {
@@ -42,7 +42,7 @@ var msTeamsProject = {
 					url: $("msTeamsProjectForm").action, 
 					data: {
 							test: 1,
-							channelUrl: $("#channelUrl").value
+							channelUrl: $("channelUrl").value
 						  },
 					type: "GET"
 				}).done(function() {
@@ -60,19 +60,19 @@ var msTeamsAdmin = {
 			method : "POST",
 			parameters : 
 				"edit=1" + 
-				"&defaultChannelUrl="             + $("#defaultChannelUrl").value +
-				"&serverEventChannelUrl="         + $("#serverEventChannelUrl").value +
-				"&notify="                        + $("#notify").checked + 
-				"&branchFilter="                  + $("#branchFilter").checked + 
-				"&branchFilterRegex="             + $("#branchFilterRegex").value + 
-				"&buildStarted="                  + $("#buildStarted").checked +
-				"&buildSuccessful="               + $("#buildSuccessful").checked +
-				"&buildFailed="                   + $("#buildFailed").checked +
-				"&buildInterrupted="              + $("#buildInterrupted").checked +
-				"&serverStartup="                 + $("#serverStartup").checked +
-				"&serverShutdown="                + $("#serverShutdown").checked + 
-				"&onlyAfterFirstBuildSuccessful=" + $("#onlyAfterFirstBuildSuccessful").checked +
-				"&onlyAfterFirstBuildFailed="     + $("#onlyAfterFirstBuildFailed").checked + 				
+				"&defaultChannelUrl="             + $("defaultChannelUrl").value +
+				"&serverEventChannelUrl="         + $("serverEventChannelUrl").value +
+				"&notify="                        + $("notify").checked + 
+				"&branchFilter="                  + $("branchFilter").checked + 
+				"&branchFilterRegex="             + $("branchFilterRegex").value + 
+				"&buildStarted="                  + $("buildStarted").checked +
+				"&buildSuccessful="               + $("buildSuccessful").checked +
+				"&buildFailed="                   + $("buildFailed").checked +
+				"&buildInterrupted="              + $("buildInterrupted").checked +
+				"&serverStartup="                 + $("serverStartup").checked +
+				"&serverShutdown="                + $("serverShutdown").checked + 
+				"&onlyAfterFirstBuildSuccessful=" + $("onlyAfterFirstBuildSuccessful").checked +
+				"&onlyAfterFirstBuildFailed="     + $("onlyAfterFirstBuildFailed").checked + 				
 				"&buildStartedTemplate="          + encodeURIComponent(document.getElementById('buildStartedTemplate').value) +
 				"&buildSuccessfulTemplate="       + encodeURIComponent(document.getElementById('buildSuccessfulTemplate').value) +
 				"&buildFailedTemplate="           + encodeURIComponent(document.getElementById('buildFailedTemplate').value) +
@@ -99,7 +99,7 @@ var msTeamsAdmin = {
 					url: $("msTeamsForm").action, 
 					data: {
 							test: 1, 
-							channelUrl: $("#serverEventChannelUrl").value
+							channelUrl: $("serverEventChannelUrl").value
 						  },
 					type: "GET"
 				}).done(function() {
@@ -115,7 +115,7 @@ var msTeamsAdmin = {
 					url: $("msTeamsForm").action, 
 					data: {
 							test: 1, 
-							channelUrl: $("#defaultChannelUrl").value
+							channelUrl: $("defaultChannelUrl").value
 						  },
 					type: "GET"
 				}).done(function() {
