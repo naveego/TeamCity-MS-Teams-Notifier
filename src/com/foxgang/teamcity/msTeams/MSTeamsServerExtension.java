@@ -86,10 +86,11 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 	@Override
 	public void buildFinished(SRunningBuild build) {
 		super.buildFinished(build);
-		Branch branch = build.getBranch();
-		List<SFinishedBuild> buildHistory = build.getBuildType().getHistory();
-		SFinishedBuild previousBuild = null;
-				
+		//Branch branch = build.getBranch();
+		//List<SFinishedBuild> buildHistory = build.getBuildType().getHistory();
+		//SFinishedBuild previousBuild = null;
+		
+		/*
 		if (branch != null) {			
 			for (SFinishedBuild tmpBuild : buildHistory) {
 				Branch tmpBranch = tmpBuild.getBranch();
@@ -103,15 +104,16 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 				previousBuild = buildHistory.get(1);
 			}
 		}
+		*/
 		
-		if (build.getBuildStatus().isSuccessful() && this.configuration.getEvents() != null && this.configuration.getEvents().getBuildSuccessfulStatus()) {
-			if (!this.configuration.getEvents().getOnlyAfterFirstBuildSuccessfulStatus() || previousBuild == null || previousBuild.getBuildStatus().isFailed()) {
+		if (build.getBuildStatus().isSuccessful()) { // && this.configuration.getEvents() != null && this.configuration.getEvents().getBuildSuccessfulStatus()) {
+			//if (!this.configuration.getEvents().getOnlyAfterFirstBuildSuccessfulStatus() || previousBuild == null || previousBuild.getBuildStatus().isFailed()) {
 				this.processBuildEvent(build, TeamCityEvent.BUILD_SUCCESSFUL);
-			}
-		} else if (build.getBuildStatus().isFailed() && this.configuration.getEvents() != null && this.configuration.getEvents().getBuildFailedStatus()) {
-			if (!this.configuration.getEvents().getOnlyAfterFirstBuildFailedStatus() || previousBuild == null || previousBuild.getBuildStatus().isSuccessful()) {
+			//}
+		} else if (build.getBuildStatus().isFailed()) { // && this.configuration.getEvents() != null && this.configuration.getEvents().getBuildFailedStatus()) {
+			//if (!this.configuration.getEvents().getOnlyAfterFirstBuildFailedStatus() || previousBuild == null || previousBuild.getBuildStatus().isSuccessful()) {
 				this.processBuildEvent(build, TeamCityEvent.BUILD_FAILED);
-			}
+			//}
 		}
 	}
 	
@@ -142,7 +144,7 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 			MSTeamsMessageBundle bundle = this.eventMap.get(event);
 			String colour = bundle.getColour();
 			String message = renderTemplate(this.templates.readTemplate(event), new HashMap<String, Object>());
-			MSTeamsRoomNotification notification = new MSTeamsRoomNotification("Title TBD", message, colour);
+			MSTeamsRoomNotification notification = new MSTeamsRoomNotification("Server Event", message, colour);
 			String roomId = this.configuration.getDefaultChannelUrl();
 			if ((event == TeamCityEvent.SERVER_STARTUP || event == TeamCityEvent.SERVER_SHUTDOWN) && 
 					this.configuration.getServerEventChannelUrl() != null) {
@@ -161,6 +163,7 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 			logger.info(String.format("Received %s build event", event));
 			if (!this.configuration.getDisabledStatus() && !build.isPersonal()) {
 				
+				/*
 		        Branch branch = build.getBranch();
 		        if ((this.configuration.getBranchFilterEnabledStatus()) && (branch != null)) {
 		          String branchDisplayName = branch.getDisplayName();
@@ -168,7 +171,8 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 		            logger.debug(String.format("Branch %s skipped", new Object[] { branchDisplayName }));
 		            return;
 		          }
-		        }
+				}
+				*/
 				
 				logger.info("Processing build event");
 				String message = createHtmlBuildEventMessage(build, event);
@@ -180,8 +184,20 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 				MSTeamsProjectConfiguration projectConfiguration = configuration.getProjectConfiguration(project.getProjectId());
 				boolean notify = projectConfiguration.getNotifyStatus();
 				boolean enabled = projectConfiguration.getEnabled();
+
+				String title = build.getBuildDescription();
+
+				if (title == null) {
+					title = "Build ";
+				}
+
+				if (event == TeamCityEvent.BUILD_SUCCESSFUL) {
+					title += " SUCCESSFUL!";
+				} else {
+					title += " FAILED!";
+				}
 				
-				MSTeamsRoomNotification notification = new MSTeamsRoomNotification("Title TBD", message, colour);
+				MSTeamsRoomNotification notification = new MSTeamsRoomNotification(title, message, colour);
 				
 				if (enabled) {
 					logger.debug(String.format("Channel to be notified: %s", channelUrl));
