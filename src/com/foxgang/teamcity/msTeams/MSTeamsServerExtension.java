@@ -181,29 +181,25 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 				SProject project = projectManager.findProjectById(build.getProjectId());
 				
 				String channelUrl = getChannelUrl(project);
-				MSTeamsProjectConfiguration projectConfiguration = configuration.getProjectConfiguration(project.getProjectId());
-				boolean notify = projectConfiguration.getNotifyStatus();
-				boolean enabled = projectConfiguration.getEnabled();
+				//MSTeamsProjectConfiguration projectConfiguration = configuration.getProjectConfiguration(project.getProjectId());
+				//boolean notify = projectConfiguration.getNotifyStatus();
+				//boolean enabled = projectConfiguration.getEnabled();
 
-				String title = build.getBuildDescription();
-
-				if (title == null) {
-					title = "Build ";
-				}
-
+			
+				String title = "";
 				if (event == TeamCityEvent.BUILD_SUCCESSFUL) {
-					title += " SUCCESSFUL!";
+					title = String.format("Build %s (%s) SUCCESS", build.getFullName(), build.getBuildNumber());
 				} else {
-					title += " FAILED!";
+					title = String.format("Build %s (%s) FAILED", build.getFullName(), build.getBuildNumber());
 				}
 				
 				MSTeamsRoomNotification notification = new MSTeamsRoomNotification(title, message, colour);
 				
-				if (enabled) {
+				//if (enabled) {
 					logger.debug(String.format("Channel to be notified: %s", channelUrl));
-					logger.debug(String.format("Notification setting: %s", notify));
+					//logger.debug(String.format("Notification setting: %s", notify));
 					this.processor.sendNotification(notification, channelUrl);
-				}
+				//}
 			}
 		} catch (Exception e) {
 			logger.error("Could not process build event", e);
@@ -228,9 +224,11 @@ public class MSTeamsServerExtension extends BuildServerAdapter {
 			return null;
 		}
 		MSTeamsProjectConfiguration projectConfiguration = configuration.getProjectConfiguration(project.getProjectId());
-		String channelUrl = projectConfiguration.getChannelUrl();
-		if (channelUrl != null && !channelUrl.equals("")) {
-			return channelUrl;
+		if (projectConfiguration != null) {
+			String channelUrl = projectConfiguration.getChannelUrl();
+			if (channelUrl != null && !channelUrl.equals("")) {
+				return channelUrl;
+			}
 		}
 		return getChannelUrl(project.getParentProject());
 	}
